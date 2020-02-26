@@ -16,11 +16,6 @@
  */
 package org.apache.logging.log4j.core.layout;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +42,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * Tests the YamlLayout class.
@@ -314,8 +312,8 @@ public class YamlLayoutTest {
                 .setConfiguration(ctx.getConfiguration())
                 .build();
         final String str = layout.toSerializable(LogEventFixtures.createLogEvent());
-        assertTrue(str, str.contains("KEY1: \"VALUE1\""));
-        assertTrue(str, str.contains("KEY2: \"" + new JavaLookup().getRuntime() + "\""));
+        assertThat(str, containsString("KEY1: \"VALUE1\""));
+        assertThat(str, containsString("KEY2: \"" + new JavaLookup().getRuntime() + "\""));
     }
 
     @Test
