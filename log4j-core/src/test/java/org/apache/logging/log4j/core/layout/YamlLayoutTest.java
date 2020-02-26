@@ -20,6 +20,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.categories.Layouts;
@@ -312,8 +315,19 @@ public class YamlLayoutTest {
                 .setConfiguration(ctx.getConfiguration())
                 .build();
         final String str = layout.toSerializable(LogEventFixtures.createLogEvent());
-        assertThat(str, containsString("KEY1: \"VALUE1\""));
-        assertThat(str, containsString("KEY2: \"" + new JavaLookup().getRuntime() + "\""));
+        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        JsonNode node = mapper.readTree(str);
+        assertThat(getJSONChildNodeValueAsText(node, "KEY1"), equalTo("VALUE1"));
+        assertThat(getJSONChildNodeValueAsText(node, "KEY2"), equalTo(new JavaLookup().getRuntime()));
+    }
+
+    private String getJSONChildNodeValueAsText(final JsonNode parentNode, final String key) {
+        JsonNode childNode = parentNode.get(key);
+        if (childNode != null) {
+            return childNode.asText();
+        } else {
+            return Strings.EMPTY;
+        }
     }
 
     @Test
